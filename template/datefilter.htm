@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"> 
+    <title>案例库</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="source/plugin/reportmanager/template/statics/js/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="source/plugin/reportmanager/template/statics/bootstrap/css/bootstrap.min.css">
+    <script src="source/plugin/reportmanager/template/statics/bootstrap/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js"></script>
+    <style>
+      body,button, input, select, textarea,h1 ,h2, h3, h4, h5, h6 
+      { font-family: Microsoft YaHei,'宋体' , Tahoma, Helvetica, Arial, "\5b8b\4f53", sans-serif;}
+
+
+
+      .footer{
+        width: 100%;
+        height: 35px;
+        display: block;
+        background: #f8f8f8;
+        position: fixed;
+        z-index: 99999;
+        bottom: 0;
+      }
+      
+      .btn-primary { 
+        border-color: #0366d6; 
+        background-color: #0366d6; 
+
+      }
+
+      .btn-primary:hover { 
+        border-color: black; 
+        background-color: black; 
+      }
+
+      .btn.disabled,
+      .btn[disabled] {
+        pointer-events: none;
+        cursor: default;
+      }
+
+    </style>
+</head>
+
+<body>
+
+  <nav class="navbar navbar-inverse">
+    <div class="container">
+      <div class="navbar-header">
+        <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">案例库</a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">
+          <li><a href="plugin.php?id=reportmanager:index">报告列表</a></li>
+          <!--{if $isAdmin == 1}-->
+          <li><a href="plugin.php?id=reportmanager:addreport">新增报告</a></li>
+          <li><a href="plugin.php?id=reportmanager:adddepartment">添加部门</a></li>
+          <li><a href="plugin.php?id=reportmanager:adduser">绑定用户</a></li>
+          <!--{/if}-->
+          <li><a href="home.php">退出</a></li>
+        </ul>
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="关键字">
+          </div>
+          <button type="submit" class="btn btn-default">搜索</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+    
+<div class="container">
+<h2><!--{$loggedDepartmentName}--></h2><br> 
+  <div class="container">
+    <div class="col-xs-8 bg-success">
+    <h4 style="    margin-top: 15px;
+    margin-bottom: 15px;">显示日期>= {$startDate} 和 <{$endDate} 的结果</h3>
+
+    </div>
+    <div class="col-xs-3 bg-success" style="height:49px;">
+      <a href="plugin.php?id=reportmanager:index" class="btn btn-primary pull-right" style="margin-top:8px;" role="button">重置</a>
+</div>
+  </div>    
+
+  <div class="container">
+    <nav>
+      <ul class="pagination" id="pagination">
+
+        <!--{loop $pages $page}--> 
+        <li><a href="plugin.php?id=reportmanager:datefilter&currentPage=$page&startDate=$startDate&endDate=$endDate" id="$page">$page</a>
+        </li>
+            <!--{/loop}-->
+
+      </ul>
+    </nav>
+  </div>
+
+  <div class="container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th width="45px">编号</th>
+                <!--{if $isAdmin == 1}-->
+                <th>部门</th>
+                <!--{/if}-->
+                <th>标题</th>
+                <th>日期</th>
+                <th>首发媒体</th>
+                <th>内容简要</th>
+                <th></th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <!--{loop $reports $mk}-->
+            <tr>
+                <td width="45px">$mk[reportId]</td>
+                <!--{if $isAdmin == 1}-->
+                <td width="100px">$mk[departmentName]</td> 
+                <!--{/if}-->
+                <td width="100px">$mk[title]</td>
+                <td width="100px">$mk[date]</td>
+                <td width="100px">$mk[media]</td>
+                <td>$mk[content]</td>
+
+                <!--{if $isAdmin == 1}-->
+                <td width="50px">
+                  <form action="plugin.php?id=reportmanager:request_handler" method="post">
+                    <input type="hidden" name="requestType" value="delete" />
+                    <input type="hidden" name="reportId" value="<!--{$mk[reportId]}-->" />
+                    <input type="hidden" name="filePath" value="<!--{$mk[filePath]}-->" />
+                    <div class="text-right">
+                    <p><button class="btn btn-primary" Onclick="return ConfirmDelete();" name="submit" type="submit" >删除</button></p>
+                     </div>
+                  </form>
+                </td> 
+                <!--{/if}-->
+
+                <td width="50px">
+                  <!--{if $mk[filePath] != null }-->
+                  <a href="<!--{$mk[filePath]}-->" class="btn btn-primary" role="button" download">下载</a>
+                  <!--{else}-->
+                  <button class="btn btn-secondary disabled" name="submit" type="submit" >下载</button>
+                  <!--{/if}-->
+                </td>
+            </tr>
+            <!--{/loop}-->
+        </tbody>
+    </table>
+  </div>
+
+</div>
+
+
+<script type="text/javascript">
+
+        $(window).scroll(function () {
+            if ($(".navbar").offset().top > 50) {$(".navbar-fixed-top").addClass("top-nav");
+            }else {$(".navbar-fixed-top").removeClass("top-nav");}
+        })
+
+function ConfirmDelete(){
+    var x = confirm("确定删除该条记录？");
+    if (x)
+		return true;
+    else
+		return false;
+    }
+	
+function setCookie(name,value) 
+{ 
+    var Days = 30; 
+    var exp = new Date(); 
+    exp.setTime(exp.getTime() + Days*24*60*60*1000); 
+    document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString(); 
+}
+
+function getCookie(name) 
+{ 
+    var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+ 
+    if(arr=document.cookie.match(reg))
+ 
+        return unescape(arr[2]); 
+    else 
+        return null; 
+}  
+	
+$(document).ready(function() {
+  var p = getCookie("pagin");
+
+  console.log(p);
+
+  $('#'+p).parent().addClass('active');
+
+  var ulId = document.getElementById("pagination");
+  var totalLi = ulId.children.length;
+
+  var pageItem = $(".pagination li");
+
+  
+  
+
+  pageItem.click(function() {
+    //pageItem.removeClass("active");
+	setCookie("pagin", this.innerText);
+  });
+  
+});
+
+
+
+</script>
+
+</body>
+
+</html>
