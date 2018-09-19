@@ -63,6 +63,33 @@ class ReportController {
 	    return $reports;
 	}
 
+	public function getSearchResults($isAdmin, $loggedDepartmentId, $currentPage, $maxRecordPerPage, $keyword) {
+
+		$offset = Paginate::getOffset($currentPage, $maxRecordPerPage);
+		$report = $reports = array();
+
+		//部门id为ADMIN，管理员登陆
+		if($isAdmin == 1 ) {
+			//$side_query = DB::query("SELECT * FROM ".DB::table('reportmanager_report'). "WHERE title like '%$keyword%'" . " ORDER BY reportId DESC LIMIT $offset,$maxRecordPerPage");
+
+			$side_query = DB::query("SELECT * FROM %t WHERE title LIKE %s", array('reportmanager_report','%'.$keyword.'%')); 
+
+			//查询得到结果集,管理员可以查看所有结果
+		} else {
+			$side_query = DB::query("SELECT * FROM ".DB::table('reportmanager_report')." WHERE departmentId = $loggedDepartmentId". " ORDER BY reportId DESC LIMIT $offset,$maxRecordPerPage"); 
+			//查询得到结果集，非管理员只能查看自己部门的结果
+			
+		}
+
+		while($report = DB::fetch($side_query)){   //将结果集赋值给数组
+			$departmentId = $report["departmentId"];
+			$departmentName = DB::fetch(DB::query("SELECT departmentName FROM ".DB::table('reportmanager_member'). " WHERE departmentId = $departmentId"));
+			$report["departmentName"] = $departmentName["departmentName"];
+			$reports[] = $report;
+		}
+	    return $reports;
+	}
+
 	public function getReportsByDateRange($isAdmin, $loggedDepartmentId, $currentPage, $maxRecordPerPage, $startDate, $endDate) {
 
 		$offset = Paginate::getOffset($currentPage, $maxRecordPerPage);
@@ -82,8 +109,6 @@ class ReportController {
 			
 		}
 
-		//var_dump($side_query);
-
 		while($report = DB::fetch($side_query)){   //将结果集赋值给数组
 			$departmentId = $report["departmentId"];
 			$departmentName = DB::fetch(DB::query("SELECT departmentName FROM ".DB::table('reportmanager_member'). " WHERE departmentId = $departmentId"));
@@ -94,12 +119,12 @@ class ReportController {
 
 	}
 
-	public function create($departmentId, $title, $media, $date, $content, $fileInfo, $fileExtension, $allowedExts, $uploadPath, $downloadPath) {
+	public function create($reportId, $departmentId, $title, $media, $date, $content, $fileInfo, $fileExtension, $allowedExts, $uploadPath, $downloadPath) {
 		if(!empty($_POST['departmentId']) && !empty($_POST['date']) && !empty($_POST['media']) && !empty($_POST['content']) && !empty($_POST['title'])) {
          
             //无上传文件
         	if(empty($_FILES["file"]["name"])) {
-        	
+
         		$data = [
                     'departmentId' => $departmentId,
                     'title' => $title,
@@ -107,7 +132,12 @@ class ReportController {
                     'date' => $date,
                     'content' => $content
                 ];
-                $sql = DB::insert('reportmanager_report', $data, true);
+
+        		if(empty($reportId)){
+	                $sql = DB::insert('reportmanager_report', $data, true);
+				} else {
+	                $sql = DB::update('reportmanager_report', $data, "reportId = $reportId", $unbuffered = false, $low_priority = false);
+				}
 
                 if( $sql ){  
 					echo '<script type="text/javascript">alert("添加报告成功!");</script>';
@@ -148,9 +178,11 @@ class ReportController {
 				                    'filePath' => $filePath
 				                ];
 
-                                
-					            $sql = DB::insert('reportmanager_report', $data, true);
-
+					            if(empty($reportId)){
+					                $sql = DB::insert('reportmanager_report', $data, true);
+								} else {
+					                $sql = DB::update('reportmanager_report', $data, "reportId = $reportId", $unbuffered = false, $low_priority = false);
+				                }
 
 					            if( $sql ){  
 

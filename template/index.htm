@@ -69,9 +69,9 @@
           <!--{/if}-->
           <li><a href="home.php">退出</a></li>
         </ul>
-        <form class="navbar-form navbar-right">
+        <form class="navbar-form navbar-right" action="plugin.php?id=reportmanager:index" method="post">
           <div class="form-group">
-            <input type="text" class="form-control" placeholder="关键字">
+            <input type="text" class="form-control" name="keyword" placeholder="关键字" pattern=".{2,}"   required title="请输入多余2个字符。">
           </div>
           <button type="submit" class="btn btn-default">搜索</button>
         </form>
@@ -138,33 +138,37 @@
             </tr>
         </thead>
         <tbody>
-            <!--{loop $reports $mk}-->
+            <!--{loop $reports $report}-->
             <tr>
-                <td width="45px">$mk[reportId]</td>
+                <td width="45px">$report[reportId]</td>
                 <!--{if $isAdmin == 1}-->
-                <td width="100px">$mk[departmentName]</td> 
+                <td width="100px">$report[departmentName]</td> 
                 <!--{/if}-->
-                <td width="100px">$mk[title]</td>
-                <td width="100px">$mk[date]</td>
-                <td width="100px">$mk[media]</td>
-                <td>$mk[content]</td>
+                <td width="100px">$report[title]</td>
+                <td width="100px">$report[date]</td>
+                <td width="100px">$report[media]</td>
+                <td>$report[content]</td>
 
                 <!--{if $isAdmin == 1}-->
                 <td width="50px">
                   <form action="plugin.php?id=reportmanager:request_handler" method="post">
                     <input type="hidden" name="requestType" value="delete" />
-                    <input type="hidden" name="reportId" value="<!--{$mk[reportId]}-->" />
-                    <input type="hidden" name="filePath" value="<!--{$mk[filePath]}-->" />
+                    <input type="hidden" name="reportId" value="<!--{$report[reportId]}-->" />
+                    <input type="hidden" name="filePath" value="<!--{$report[filePath]}-->" />
                     <div class="text-right">
                     <p><button class="btn btn-primary" Onclick="return ConfirmDelete();" name="submit" type="submit" >删除</button></p>
                      </div>
                   </form>
+                </td>
+
+                <td width="50px">                  
+                  <a href="plugin.php?id=reportmanager:updatereport&reportId=$report[reportId]&title=$report[title]&media=$report[media]&date=$report[date]&departmentId=$report[departmentId]&content=$report[content]" class="btn btn-primary" role="button" download">修改</a>
                 </td> 
                 <!--{/if}-->
 
                 <td width="50px">
-                  <!--{if $mk[filePath] != null }-->
-                  <a href="<!--{$mk[filePath]}-->" class="btn btn-primary" role="button" download">下载</a>
+                  <!--{if $report[filePath] != null }-->
+                  <a href="<!--{$report[filePath]}-->" class="btn btn-primary" role="button" download">下载</a>
                   <!--{else}-->
                   <button class="btn btn-secondary disabled" name="submit" type="submit" >下载</button>
                   <!--{/if}-->

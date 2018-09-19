@@ -40,8 +40,16 @@ $totalPages = Paginate::getTotalPages($reportCount, $maxRecordPerpage);
 //将总页数转化成array
 $pages = Paginate::pagesToArray($totalPages);
 
-$reports = ReportController::getReports($isAdmin, $loggedDepartmentId, $currentPage, $maxRecordPerpage);
+//$reports = ReportController::getReports($isAdmin, $loggedDepartmentId, $currentPage, $maxRecordPerpage);
 
+if (empty($_POST['keyword'])) {
+
+	$reports = ReportController::getReports($isAdmin, $loggedDepartmentId, $currentPage, $maxRecordPerpage);
+
+} else {
+	$keyword = $_POST['keyword'];
+    $reports = ReportController::getSearchResults($isAdmin, $loggedDepartmentId, $currentPage, $maxRecordPerpage, $keyword);
+}
 
 
 $reports['departmentId'];

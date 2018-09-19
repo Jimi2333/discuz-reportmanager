@@ -17,12 +17,12 @@ $requestType = empty($_POST['requestType']) ? "" : $_POST['requestType'];
 switch ($requestType) {
 
     case 'insert':
-    
+        
+        $reportId=empty($_POST['reportId']) ? "" : $_POST['reportId'];
         $departmentId=empty($_POST['departmentId']) ? "" : $_POST['departmentId'];
         $title=empty($_POST['title']) ? "" : $_POST['title'];
         $media=empty($_POST['media']) ? "" : $_POST['media'];
         $date=empty($_POST['date']) ? "" : $_POST['date'];
-
         $content=empty($_POST['content'])? "" : $_POST['content'];
         
         $uploadPath = DISCUZ_ROOT.'data/attachment/reportmanager/'; //linux 的上传路径
@@ -33,7 +33,7 @@ switch ($requestType) {
         $fileExtension = end($temp); // 获取文件后缀名
         $fileInfo= $_FILES['file'];
 
-        ReportController::create($departmentId, $title, $media, $date, $content, $fileInfo, $fileExtension, $allowedExts, $uploadPath, $downloadPath);
+        ReportController::create($reportId, $departmentId, $title, $media, $date, $content, $fileInfo, $fileExtension, $allowedExts, $uploadPath, $downloadPath);
     break;
 
     case 'insertDepartment':
